@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Intro to R Workshop</title>
+    <meta charset="utf-8">
+    <meta name="author" content="Will Dearden" />
+    <meta name="date" content="2018-08-21" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Intro to R Workshop
+### Will Dearden
+### 2018-08-21
+
+---
+
+
+
+
+# R is an interpreted language
+
+- No need to compile
+
+--
+
+- Easy to write scripts
+
+--
+
+- Can run code interactively
+
+---
+
+# R is a dynamically typed language
+
+No need to declare types
+
+--
+
+
+```r
+x &lt;- 2
+x
+```
+
+```
+## [1] 2
+```
+
+```r
+y &lt;- TRUE
+y
+```
+
+```
+## [1] TRUE
+```
+
+```r
+z &lt;- x * y
+z
+```
+
+```
+## [1] 2
+```
+
+---
+
+# R is a functional language
+
+&gt; Everything that exists is an object
+
+&gt; Everything that happens is a function call
+
+--
+
+- Easy to tell what code does
+
+--
+
+- Easy to get help
+
+--
+
+- Composable
+
+
+```r
+lapply(1:3, rnorm)
+```
+
+```
+## [[1]]
+## [1] -1.749606
+## 
+## [[2]]
+## [1] 0.7961782 0.7142310
+## 
+## [[3]]
+## [1] -0.1868971  1.3138618 -0.8098791
+```
+
+---
+
+# What Makes R Different
+
+- No scalars, only vectors
+
+--
+
+- `NA` automatically supported
+
+--
+
+- Lazy evaluation
+
+
+```r
+library(dplyr)
+
+filter(starwars, species == "Human")
+```
+
+---
+
+# R Scripts
+
+An R script is a text file with the `.R` extension.
+
+
+```r
+# my_script.R
+
+x &lt;- c(1, 3, 4)
+sum(x)
+```
+
+You can run `my_script.R` by calling `source("my_script.R")`.
+
+---
+
+# How to get help
+
+You can use `?` from R to get help
+
+
+```r
+?sum
+```
+
+---
+
+# Variables and namespaces
+
+When you execute a statement like `x &lt;- 5` in R, you are creating an **object** in memory which holds the numeric **value** 5 and is referenced by the **variable name** "x".
+
+--
+
+If you later ask R to do something like `y &lt;- x + 2`, it will search sequentially through a series of **namespaces** until it finds a variable called "x". Namespaces can be thought of as collections of labels pointing to places in memory. You can use R's `search` command to examine the ordered list of namespaces that R will search in for variables.
+
+
+```r
+# Check the search path of namespaces
+search()
+
+# use ls() to list the objects in one of those namespaces
+ls("package:stats")
+```
+
+---
+
+# Packages
+
+A package is just a collection of objects with names. You can install a package with `install.packages` and load a package into the search path with the `library` function.
+
+
+```r
+install.packages('dplyr')
+library(dplyr)
+
+starwars
+```
+
+--
+
+You can also explicitly reference an object from a package with `::` without loading the package.
+
+
+```r
+dplyr::starwars
+```
+
+---
+
+# Introduction to types
+
+R has a small set of important types. You do not need to explicitly declare types
+
+- *integer*: non-complex whole numbers. created with an L like
+
+```r
+anInteger &lt;- 1L
+```
+- *numeric*: all real numbers. Default type for numbers in R 
+
+```r
+someNums &lt;- c(1.005, 2)
+```
+- *logical*: TRUE or FALSE. 
+
+```r
+someLogicals &lt;- c(TRUE, FALSE, FALSE)
+```
+- *character*: strings of arbitrary characters. Sometimes referred to informally as "text data". - 
+
+```r
+stringVar &lt;- "Loren ipsum"
+```
+
+---
+
+# Introduction to types
+
+You can convert between types with the `as.*` series of functions.
+
+
+```r
+as.integer('1')
+```
+
+```
+## [1] 1
+```
+
+```r
+as.logical(0)
+```
+
+```
+## [1] FALSE
+```
+
+--
+
+You can find the type with `class`.
+
+
+```r
+class(2)
+```
+
+```
+## [1] "numeric"
+```
+---
+
+# Quick math
+
+
+```r
+2L + 0.05
+```
+
+```
+## [1] 2.05
+```
+
+```r
+2 + TRUE
+```
+
+```
+## [1] 3
+```
+
+```r
+TRUE + TRUE
+```
+
+```
+## [1] 2
+```
+
+```r
+TRUE * FALSE
+```
+
+```
+## [1] 0
+```
+
+---
+
+# Everything is a vector
+
+R has no scalars. Everything is automatically a vector.
+
+
+```r
+x &lt;- c(1, 2, 3)
+y &lt;- 1:3
+
+is.vector(2)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+2 == c(2)
+```
+
+```
+## [1] TRUE
+```
+
+---
+
+# Everything is a vector
+
+Every function you write for scalars automatically applies to vectors.
+
+
+```r
+c(0, 2) + c(3, 6)
+```
+
+```
+## [1] 3 8
+```
+
+```r
+c(0, 2) + 1
+```
+
+```
+## [1] 1 3
+```
+
+---
+
+# Subsetting
+
+Subsetting is done with square brackets. You can use either `logical` or `integer` to subset a vector.
+
+
+```r
+x &lt;- 1:5
+
+x[c(2, 4)]
+```
+
+```
+## [1] 2 4
+```
+
+```r
+x[c(FALSE, TRUE, FALSE, TRUE, FALSE)]
+```
+
+```
+## [1] 2 4
+```
+
+```r
+x[x %% 2 == 0]
+```
+
+```
+## [1] 2 4
+```
+
+---
+
+# Missings are built-in
+
+R automatically handles missing values and are built-in to every base type.
+
+
+```r
+x &lt;- c(1, NA)
+
+x + 1
+```
+
+```
+## [1]  2 NA
+```
+
+```r
+NA == 1
+```
+
+```
+## [1] NA
+```
+
+```r
+NA == NA
+```
+
+```
+## [1] NA
+```
+
+```r
+is.na(NA)
+```
+
+```
+## [1] TRUE
+```
+
+---
+
+# Controlling program flow
+
+You can use `if-else` blocks to control program flow
+
+
+```r
+if (4 &gt; 5) {
+    print("3")
+} else if (6 &lt;= (5/10)) {
+    print("1")
+} else if (4 + 4 + 4 == 12.0001) {
+    print("4")
+} else {
+    print("2")
+}
+```
+
+---
+
+# Iteration
+
+You can use `for` loops to iterate through an object.
+
+
+```r
+# Create a vector
+x &lt;- c(1, 4, 6)
+
+for (some_number in x) {
+    print(some_number^2)
+}
+```
+
+---
+
+# Iteration
+
+Better yet, you can use `lapply` or `purrr::map` to call a function for every element in an object.
+
+
+```r
+lapply(c(0, 1, 2), exp)
+```
+
+```
+## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 2.718282
+## 
+## [[3]]
+## [1] 7.389056
+```
+
+---
+
+# Functions
+
+R is a [functional programming language](http://adv-r.had.co.nz/Functions.html). To write powerful, concise code, you'll need to master the use and creation of functions.
+
+&gt; "If you find yourself copying and pasting the same code more than twice, it's time to write a function." - Hadley Wickham
+
+
+
+```r
+# Function to return only the even numbers from a vector
+answers &lt;- c(1, 3, 4, 8, 13, 24)
+
+getEvens &lt;- function(some_numbahs){
+    the_evens &lt;- some_numbahs[some_numbahs %% 2 == 0]
+    return(the_evens)
+}
+
+getEvens(answers)
+```
+
+---
+
+# Required Arguments
+
+- R functions take 0 or more arguments...basically named variables that the function uses to do it's work
+- Take a look at `?sqrt`. You'll see that it takes one argument, named `x`. You can pass any vector of numeric values to this argument and `sqrt` will return the square root of each element
+- In this case, we'd say `x` is a *required argument* of `sqrt`
+
+
+```r
+# Take the square root of a vector of numbers
+sqrt(x = c(1,4,9,16,25))
+
+# Note that calling this function without the argument will throw an error!
+sqrt()
+### Error in sqrt(): 0 arguments passed to `sqrt` which requires 1
+```
+
+---
+
+# Default Argument Values
+
+- For more complicated functions, passing values to each argument can get burdensome
+- To handle this, R allows function authors to specify *default arguments*. These are values that certain arguments will take automatically unless you decide to overwrite them
+- Example: look at `?rnorm`. You'll see that this function's signature reads `rnorm(n, mean = 0, sd = 1)`.
+
+
+```r
+# 100 random draws from a normal distribution w/ mean 0 and standard deviation 1
+rand_nums &lt;- rnorm(n = 100)
+
+# 100 random draws from a normal distribution w/ mean 4.5 and standard deviation 1
+rand_nums &lt;- rnorm(n = 100, mean = 4.5)
+```
+
+---
+
+# Data frames
+
+Vectors are crucial data structures in R, but you may find that they're difficult to work with in model training and other data science tasks. It is now time to introduce a third foundational data structure: the data frame.
+
+Data frames are tables of data. Each column of a dataframe can be a different type, but all values within a column must be the same type.
+
+
+```r
+# Create a dataframe!
+myDF &lt;- data.frame(
+    time_period = c(1, 2, 3, 4, 5)
+    , temperature = c(25.6, 38.7, 31.4, 40.0, 29.20)
+    , station = c("A", "B", "A", "A", "B")
+    , is_gov_owned = c(TRUE, FALSE, TRUE, TRUE, FALSE)
+)
+
+# Check out the structure of this thing
+str(myDF)
+```
+
+---
+--- 
+
+# Data frames
+
+R comes with some sample data sets you can experiment with. Let's load the `mtcars` data.frame and test out some new commands!
+
+
+```r
+# Load the mtcars dataframe
+data("mtcars")
+
+# Check out its structure
+str(mtcars)
+
+# View the top 10 rows
+head(mtcars, n = 10) # could use "tail" for the bottom 10
+
+# Find all the unique values of "cyl" (the number of engine cylinders)
+unique(mtcars$cyl)
+```
+
+---
+--- 
+
+# Data frames
+
+`apply` allows you to loop over the rows or columns of a data frame and execute an arbitrary function. The code below holds some examples of what can be accomplished with `apply`.
+
+
+```r
+# Get the mean of each column
+apply(mtcars, MARGIN = 2, FUN = mean)
+
+# Get the mean of each row (nonsensical, just illustrating
+apply(mtcars, MARGIN = 1, FUN = mean)
+```
+
+---
+
+# Data frames
+
+There are many functions to read in data frames from a csv, including `read.csv`, `readr::read_csv`, and `data.table::fread`.
+
+
+```r
+read_csv("/path/to/file/mtcars.csv")
+```
+
+---
+
+# Resources
+
+[R for Data Science](http://r4ds.had.co.nz/) - *Garrett Grolemund* and *Hadley Wickham*
+
+[Advanced R](https://adv-r.hadley.nz/) - *Hadley Wickham*
+
+[R Packages](http://r-pkgs.had.co.nz/) - *Hadley Wickham*
+
+---
+
+# Useful Packages
+
+Tidyverse
+
+- `dplyr`: adding and choosing columns, subsetting, summarizng, sorting
+- `tidyr`: reshape data (make your data "tidy")
+- `ggplot2`: visualize data with an elegant "grammar"
+- `readr`: import data
+- `purrr`: functional programming
+- `stringr`: manipulate strings
+- `lubridate`: manipulate dates
+- `magrittr`: the pipe `%&gt;%`
+
+--
+
+High Performance
+
+- `Rcpp`: write R functions that call C++ code
+- `data.table`: `dplyr` but crazy fast
+
+---
+
+# Useful Packages
+
+Development
+
+- `devtools`: build R packages faster
+- `testthat`: write unit tests
+- `roxygen2`: document your code
+
+--
+
+Work with the web
+
+- `jsonlite`: read and create JSON
+- `httr`: receive and send http requests
+- `rvest`: scrape HTML pages
+- `plumber`: create an API from your R functions
+
+--
+
+Share results
+
+- `leaflet`: create maps from R
+- `shiny`: create a web app which runs R code
+- `rmarkdown`: create documents (pdf, html, docx) which run R code
+- `plotly`: create interactive plots
+
+---
+
+# Useful Packages
+
+Model pipelining
+
+- `caret`: create model pipelines
+- `parsnip`: under development, meant to replace caret
+- `tidymodels`: collection of packages for modelling
+
+--
+
+Specific models
+
+- `lme4`: mixed effects models
+- `randomForest`: tree models
+- `xgboost`: tree models
+- `rstan`: run bayesian Stan models
+- `keras`: deep learning
+    </textarea>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function() {
+  var d = document, s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})();</script>
+
+<script>
+(function() {
+  var i, text, code, codes = document.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+})();
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -1,0 +1,522 @@
+---
+title: "Intro to R Workshop"
+author: "Will Dearden"
+date: "2018-08-21"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+# R is an interpreted language
+
+- No need to compile
+
+--
+
+- Easy to write scripts
+
+--
+
+- Can run code interactively
+
+---
+
+# R is a dynamically typed language
+
+No need to declare types
+
+--
+
+```{r}
+x <- 2
+x
+
+y <- TRUE
+y
+
+z <- x * y
+z
+```
+
+---
+
+# R is a functional language
+
+> Everything that exists is an object
+
+> Everything that happens is a function call
+
+--
+
+- Easy to tell what code does
+
+--
+
+- Easy to get help
+
+--
+
+- Composable
+
+```{r}
+lapply(1:3, rnorm)
+```
+
+---
+
+# What Makes R Different
+
+- No scalars, only vectors
+
+--
+
+- `NA` automatically supported
+
+--
+
+- Lazy evaluation
+
+```{r, eval = FALSE}
+library(dplyr)
+
+filter(starwars, species == "Human")
+
+```
+
+---
+
+# R Scripts
+
+An R script is a text file with the `.R` extension.
+
+```{r, eval = FALSE}
+# my_script.R
+
+x <- c(1, 3, 4)
+sum(x)
+```
+
+You can run `my_script.R` by calling `source("my_script.R")`.
+
+---
+
+# How to get help
+
+You can use `?` from R to get help
+
+```{r, eval = FALSE}
+?sum
+```
+
+---
+
+# Variables and namespaces
+
+When you execute a statement like `x <- 5` in R, you are creating an **object** in memory which holds the numeric **value** 5 and is referenced by the **variable name** "x".
+
+--
+
+If you later ask R to do something like `y <- x + 2`, it will search sequentially through a series of **namespaces** until it finds a variable called "x". Namespaces can be thought of as collections of labels pointing to places in memory. You can use R's `search` command to examine the ordered list of namespaces that R will search in for variables.
+
+```{r, eval = FALSE}
+# Check the search path of namespaces
+search()
+
+# use ls() to list the objects in one of those namespaces
+ls("package:stats")
+```
+
+---
+
+# Packages
+
+A package is just a collection of objects with names. You can install a package with `install.packages` and load a package into the search path with the `library` function.
+
+```{r, eval = FALSE}
+install.packages('dplyr')
+library(dplyr)
+
+starwars
+```
+
+--
+
+You can also explicitly reference an object from a package with `::` without loading the package.
+
+```{r, eval = FALSE}
+dplyr::starwars
+```
+
+---
+
+# Introduction to types
+
+R has a small set of important types. You do not need to explicitly declare types
+
+- *integer*: non-complex whole numbers. created with an L like
+```{r}
+anInteger <- 1L
+```
+- *numeric*: all real numbers. Default type for numbers in R 
+```{r}
+someNums <- c(1.005, 2)
+```
+- *logical*: TRUE or FALSE. 
+```{r}
+someLogicals <- c(TRUE, FALSE, FALSE)
+```
+- *character*: strings of arbitrary characters. Sometimes referred to informally as "text data". - 
+```{r}
+stringVar <- "Loren ipsum"
+```
+
+---
+
+# Introduction to types
+
+You can convert between types with the `as.*` series of functions.
+
+```{r}
+as.integer('1')
+
+as.logical(0)
+```
+
+--
+
+You can find the type with `class`.
+
+```{r}
+class(2)
+```
+---
+
+# Quick math
+
+```{r}
+2L + 0.05
+
+2 + TRUE
+
+TRUE + TRUE
+
+TRUE * FALSE
+```
+
+---
+
+# Everything is a vector
+
+R has no scalars. Everything is automatically a vector.
+
+```{r}
+x <- c(1, 2, 3)
+y <- 1:3
+
+is.vector(2)
+
+2 == c(2)
+
+```
+
+---
+
+# Everything is a vector
+
+Every function you write for scalars automatically applies to vectors.
+
+```{r}
+c(0, 2) + c(3, 6)
+
+c(0, 2) + 1
+
+```
+
+---
+
+# Subsetting
+
+Subsetting is done with square brackets. You can use either `logical` or `integer` to subset a vector.
+
+```{r}
+x <- 1:5
+
+x[c(2, 4)]
+
+x[c(FALSE, TRUE, FALSE, TRUE, FALSE)]
+
+x[x %% 2 == 0]
+```
+
+---
+
+# Missings are built-in
+
+R automatically handles missing values and are built-in to every base type.
+
+```{r}
+x <- c(1, NA)
+
+x + 1
+
+NA == 1
+
+NA == NA
+
+is.na(NA)
+
+```
+
+---
+
+# Controlling program flow
+
+You can use `if-else` blocks to control program flow
+
+```{r, eval = FALSE}
+if (4 > 5) {
+    print("3")
+} else if (6 <= (5/10)) {
+    print("1")
+} else if (4 + 4 + 4 == 12.0001) {
+    print("4")
+} else {
+    print("2")
+}
+```
+
+---
+
+# Iteration
+
+You can use `for` loops to iterate through an object.
+
+```{r eval = FALSE}
+
+# Create a vector
+x <- c(1, 4, 6)
+
+for (some_number in x) {
+    print(some_number^2)
+}
+
+```
+
+---
+
+# Iteration
+
+Better yet, you can use `lapply` or `purrr::map` to call a function for every element in an object.
+
+```{r}
+lapply(c(0, 1, 2), exp)
+```
+
+---
+
+# Functions
+
+R is a [functional programming language](http://adv-r.had.co.nz/Functions.html). To write powerful, concise code, you'll need to master the use and creation of functions.
+
+> "If you find yourself copying and pasting the same code more than twice, it's time to write a function." - Hadley Wickham
+
+
+```{r functionExample, eval = FALSE}
+# Function to return only the even numbers from a vector
+answers <- c(1, 3, 4, 8, 13, 24)
+
+getEvens <- function(some_numbahs){
+    the_evens <- some_numbahs[some_numbahs %% 2 == 0]
+    return(the_evens)
+}
+
+getEvens(answers)
+```
+
+---
+
+# Required Arguments
+
+- R functions take 0 or more arguments...basically named variables that the function uses to do it's work
+- Take a look at `?sqrt`. You'll see that it takes one argument, named `x`. You can pass any vector of numeric values to this argument and `sqrt` will return the square root of each element
+- In this case, we'd say `x` is a *required argument* of `sqrt`
+
+```{r requiredArgs, eval = FALSE}
+# Take the square root of a vector of numbers
+sqrt(x = c(1,4,9,16,25))
+
+# Note that calling this function without the argument will throw an error!
+sqrt()
+### Error in sqrt(): 0 arguments passed to `sqrt` which requires 1
+```
+
+---
+
+# Default Argument Values
+
+- For more complicated functions, passing values to each argument can get burdensome
+- To handle this, R allows function authors to specify *default arguments*. These are values that certain arguments will take automatically unless you decide to overwrite them
+- Example: look at `?rnorm`. You'll see that this function's signature reads `rnorm(n, mean = 0, sd = 1)`.
+
+```{r normalDraw}
+# 100 random draws from a normal distribution w/ mean 0 and standard deviation 1
+rand_nums <- rnorm(n = 100)
+
+# 100 random draws from a normal distribution w/ mean 4.5 and standard deviation 1
+rand_nums <- rnorm(n = 100, mean = 4.5)
+```
+
+---
+
+# Data frames
+
+Vectors are crucial data structures in R, but you may find that they're difficult to work with in model training and other data science tasks. It is now time to introduce a third foundational data structure: the data frame.
+
+Data frames are tables of data. Each column of a dataframe can be a different type, but all values within a column must be the same type.
+
+```{r dataFrame, eval = FALSE}
+# Create a dataframe!
+myDF <- data.frame(
+    time_period = c(1, 2, 3, 4, 5)
+    , temperature = c(25.6, 38.7, 31.4, 40.0, 29.20)
+    , station = c("A", "B", "A", "A", "B")
+    , is_gov_owned = c(TRUE, FALSE, TRUE, TRUE, FALSE)
+)
+
+# Check out the structure of this thing
+str(myDF)
+```
+
+---
+--- 
+
+# Data frames
+
+R comes with some sample data sets you can experiment with. Let's load the `mtcars` data.frame and test out some new commands!
+
+```{r dateFrame2, eval = FALSE}
+# Load the mtcars dataframe
+data("mtcars")
+
+# Check out its structure
+str(mtcars)
+
+# View the top 10 rows
+head(mtcars, n = 10) # could use "tail" for the bottom 10
+
+# Find all the unique values of "cyl" (the number of engine cylinders)
+unique(mtcars$cyl)
+```
+
+---
+--- 
+
+# Data frames
+
+`apply` allows you to loop over the rows or columns of a data frame and execute an arbitrary function. The code below holds some examples of what can be accomplished with `apply`.
+
+```{r apply_on_a_DF, eval = FALSE}
+# Get the mean of each column
+apply(mtcars, MARGIN = 2, FUN = mean)
+
+# Get the mean of each row (nonsensical, just illustrating
+apply(mtcars, MARGIN = 1, FUN = mean)
+```
+
+---
+
+# Data frames
+
+There are many functions to read in data frames from a csv, including `read.csv`, `readr::read_csv`, and `data.table::fread`.
+
+```{r, eval = FALSE}
+read_csv("/path/to/file/mtcars.csv")
+```
+
+---
+
+# Resources
+
+[R for Data Science](http://r4ds.had.co.nz/) - *Garrett Grolemund* and *Hadley Wickham*
+
+[Advanced R](https://adv-r.hadley.nz/) - *Hadley Wickham*
+
+[R Packages](http://r-pkgs.had.co.nz/) - *Hadley Wickham*
+
+---
+
+# Useful Packages
+
+Tidyverse
+
+- `dplyr`: adding and choosing columns, subsetting, summarizng, sorting
+- `tidyr`: reshape data (make your data "tidy")
+- `ggplot2`: visualize data with an elegant "grammar"
+- `readr`: import data
+- `purrr`: functional programming
+- `stringr`: manipulate strings
+- `lubridate`: manipulate dates
+- `magrittr`: the pipe `%>%`
+
+--
+
+High Performance
+
+- `Rcpp`: write R functions that call C++ code
+- `data.table`: `dplyr` but crazy fast
+
+---
+
+# Useful Packages
+
+Development
+
+- `devtools`: build R packages faster
+- `testthat`: write unit tests
+- `roxygen2`: document your code
+
+--
+
+Work with the web
+
+- `jsonlite`: read and create JSON
+- `httr`: receive and send http requests
+- `rvest`: scrape HTML pages
+- `plumber`: create an API from your R functions
+
+--
+
+Share results
+
+- `leaflet`: create maps from R
+- `shiny`: create a web app which runs R code
+- `rmarkdown`: create documents (pdf, html, docx) which run R code
+- `plotly`: create interactive plots
+
+---
+
+# Useful Packages
+
+Model pipelining
+
+- `caret`: create model pipelines
+- `parsnip`: under development, meant to replace caret
+- `tidymodels`: collection of packages for modelling
+
+--
+
+Specific models
+
+- `lme4`: mixed effects models
+- `randomForest`: tree models
+- `xgboost`: tree models
+- `rstan`: run bayesian Stan models
+- `keras`: deep learning
